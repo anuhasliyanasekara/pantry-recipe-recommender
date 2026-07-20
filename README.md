@@ -22,5 +22,5 @@ Sanity-checked manually - given a pantry list, confirm returned recipes only req
 - During model selection, K-Fold cross-validation is used to compare different models/settings (e.g. SVD vs KNN, different numbers of latent factors) to avoid picking a model that just got lucky on one split.
 - The best-performing model/settings (chosen via cross-validation) is then evaluated once on the held-out test set for a final, honest performance number.
 - **Metrics used:**
-  - **RMSE** — how far off predicted ratings are from actual ratings, on average.
-  - **Precision@10** — of the top 10 recipes recommended, how many the user actually rated 4-5 stars. This matters more for us since the real output is a ranked list, not a single predicted number.
+  - **RMSE** - how far off predicted ratings are from actual ratings, on average.
+  - **Precision@10** - of the top 10 recipes recommended, how many the user actually rated 4-5 stars. This matters more for us since the real output is a ranked list, not a single predicted number.
