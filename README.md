@@ -24,3 +24,7 @@ Sanity-checked manually - given a pantry list, confirm returned recipes only req
 - **Metrics used:**
   - **RMSE** - how far off predicted ratings are from actual ratings, on average.
   - **Precision@10** - of the top 10 recipes recommended, how many the user actually rated 4-5 stars. This matters more for us since the real output is a ranked list, not a single predicted number.
+
+## Results (baseline)
+- Model: SVD (surprise library), n_factors=20
+- Test RMSE: 1.2116
