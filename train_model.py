@@ -17,3 +17,14 @@ data = Dataset.load_from_df(interactions_small, reader)
 
 print("Data loaded into surprise successfully")
 print(type(data))
+
+
+#split data 20% for testing and 80% for training
+from surprise.model_selection import train_test_split
+
+trainset, testset = train_test_split(data, test_size=0.2, random_state=42)
+
+print(type(trainset))
+print(type(testset))
+print("Training set size:", trainset.n_ratings)
+print("Test set size:", len(testset))
