@@ -28,3 +28,20 @@ print(type(trainset))
 print(type(testset))
 print("Training set size:", trainset.n_ratings)
 print("Test set size:", len(testset))
+
+#train the model
+
+from surprise import SVD
+from surprise import accuracy
+
+# create the model
+model = SVD(n_factors=20, random_state=42)
+
+# train it on our training set
+model.fit(trainset)
+
+print("Model trained successfully")
+
+predictions = model.test(testset)
+
+rmse = accuracy.rmse(predictions)
