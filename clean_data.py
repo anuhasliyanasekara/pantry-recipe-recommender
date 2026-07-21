@@ -47,6 +47,36 @@ def recipe_is_makeable(pantry, recipe_ingredients):
             return False   # this recipe needs something the pantry doesn't have
     return True   # every ingredient found a match
 
+#this counts how many ingrediants user has
+
+def count_missing_ingredients(pantry, recipe_ingredients):
+    """
+    pantry: list of ingredients the user has
+    recipe_ingredients: list of ingredients a recipe needs
+    Returns the number of recipe ingredients that have NO match in the pantry.
+    """
+    missing_count = 0
+    for recipe_ing in recipe_ingredients:
+        matched = False
+        for pantry_item in pantry:
+            if pantry_item in recipe_ing:
+                matched = True
+                break
+        if not matched:
+            missing_count += 1
+    return missing_count
+
+
+#give a ratio of missing items and items in the recipe
+def missing_ratio(pantry, recipe_ingredients):
+    """
+    Returns the fraction of recipe ingredients NOT found in the pantry.
+    Lower is better. 0.0 = fully makeable.
+    """
+    missing = count_missing_ingredients(pantry, recipe_ingredients)
+    return missing / len(recipe_ingredients)
+
+
 test_pantry = ["squash", "butter", "honey", "oil", "salt"]
 
 first_recipe_ingredients = recipes.loc[0, "ingredients"]
@@ -72,3 +102,22 @@ for index, row in recipes.iterrows():
 
 print("Number of makeable recipes:", len(makeable_recipes))
 print(makeable_recipes[:10])   # just show the first 10
+
+
+
+#show recipe with low ratio and higher items
+my_pantry = ["squash", "honey", "butter", "oil", "salt", "onion", "garlic"]
+
+recipe_scores = []
+
+for index, row in recipes.iterrows():
+    ratio = missing_ratio(my_pantry, row["ingredients"])
+    num_ingredients = len(row["ingredients"])
+    recipe_scores.append((row["name"], ratio, num_ingredients))
+
+# sort by: ratio ascending (fewer missing = better),
+# then num_ingredients descending (more complete meals first)
+recipe_scores.sort(key=lambda x: (x[1], -x[2]))
+
+for name, ratio, num_ingredients in recipe_scores[:10]:
+    print(f"{ratio:.2f} missing ratio, {num_ingredients} ingredients - {name}")
