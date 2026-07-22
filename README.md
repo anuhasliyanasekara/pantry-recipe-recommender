@@ -41,7 +41,7 @@ We compared SVD and KNN-based collaborative filtering, being careful to test bot
 | SVD (tuned) | Filtered dataset (users/recipes with ≥20 ratings) | 0.8794 |
 
 **Key findings:**
-- Filtering to more active users and popular recipes improved performance far more than switching models — data sparsity, not model choice, was the primary bottleneck.
+- Filtering to more active users and popular recipes improved performance far more than switching models - data sparsity, not model choice, was the primary bottleneck.
 - Once compared fairly on identical data, SVD outperformed KNN.
 - **Final model: SVD (n_factors=10, reg_all=0.1) trained on the filtered dataset, RMSE 0.8794.**
 
@@ -61,4 +61,4 @@ We compared SVD and KNN-based collaborative filtering, being careful to test bot
 | SVD (tuned) | Filtered dataset (cross-validated) | 0.8794 |
 | **SVD (tuned) — FINAL** | **Filtered dataset (held-out test)** | **0.8727** |
 
-**Key takeaway:** Data sparsity was the primary bottleneck, not model choice — filtering to more active users/recipes improved RMSE far more than switching from SVD to KNN.
+**Key takeaway:** Data sparsity was the primary bottleneck, not model choice - filtering to more active users/recipes improved RMSE far more than switching from SVD to KNN.
