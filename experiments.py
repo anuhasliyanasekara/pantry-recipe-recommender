@@ -14,3 +14,11 @@ for factors in [10, 20, 50, 100]:
     results = cross_validate(model, data, measures=["RMSE"], cv=3, verbose=False)
     avg_rmse = results["test_rmse"].mean()
     print(f"Average RMSE: {avg_rmse:.4f}")
+
+
+for reg in [0.02, 0.05, 0.1, 0.2]:
+    print(f"\nTesting reg_all={reg}")
+    model = SVD(n_factors=10, reg_all=reg, random_state=42)
+    results = cross_validate(model, data, measures=["RMSE"], cv=3, verbose=False)
+    avg_rmse = results["test_rmse"].mean()
+    print(f"Average RMSE: {avg_rmse:.4f}")
