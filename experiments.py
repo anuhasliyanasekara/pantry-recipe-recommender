@@ -1,5 +1,5 @@
 import pandas as pd
-from surprise import Dataset, Reader, SVD
+from surprise import Dataset, Reader, SVD, accuracy
 from surprise.model_selection import cross_validate
 
 interactions = pd.read_csv("data/RAW_interactions.csv")
@@ -55,3 +55,16 @@ model_svd_filtered = SVD(n_factors=10, reg_all=0.1, random_state=42)
 results_svd_filtered = cross_validate(model_svd_filtered, data_small, measures=["RMSE"], cv=3, verbose=False)
 avg_rmse_svd_filtered = results_svd_filtered["test_rmse"].mean()
 print(f"SVD (filtered data) Average RMSE: {avg_rmse_svd_filtered:.4f}")
+
+from surprise.model_selection import train_test_split as surprise_train_test_split
+
+# recreate a proper train/test split, but on the FILTERED data this time
+trainset_final, testset_final = surprise_train_test_split(data_small, test_size=0.2, random_state=42)
+
+# train our winning model fresh, only on this training portion
+final_model = SVD(n_factors=10, reg_all=0.1, random_state=42)
+final_model.fit(trainset_final)
+
+# evaluate once, honestly, on data it's never seen
+final_predictions = final_model.test(testset_final)
+final_rmse = accuracy.rmse(final_predictions)
