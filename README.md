@@ -28,3 +28,19 @@ Sanity-checked manually - given a pantry list, confirm returned recipes only req
 ## Results (baseline)
 - Model: SVD (surprise library), n_factors=20
 - Test RMSE: 1.2116
+
+
+## Experiments
+
+We compared SVD and KNN-based collaborative filtering, being careful to test both fairly on identical data.
+
+| Model | Data | RMSE |
+|---|---|---|
+| SVD (tuned: n_factors=10, reg_all=0.1) | Full dataset (1.13M ratings) | 1.2153 |
+| KNNBasic | Filtered dataset (users/recipes with ≥20 ratings) | 0.9644 |
+| SVD (tuned) | Filtered dataset (users/recipes with ≥20 ratings) | 0.8794 |
+
+**Key findings:**
+- Filtering to more active users and popular recipes improved performance far more than switching models — data sparsity, not model choice, was the primary bottleneck.
+- Once compared fairly on identical data, SVD outperformed KNN.
+- **Final model: SVD (n_factors=10, reg_all=0.1) trained on the filtered dataset, RMSE 0.8794.**
