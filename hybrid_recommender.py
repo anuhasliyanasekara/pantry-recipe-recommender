@@ -40,42 +40,42 @@ def count_missing_ingredients(pantry, recipe_ingredients):
 
 
 def recommend_recipes(user_id, pantry, max_missing_ratio=0.2, top_n=10):
-    """
-    user_id: the user we're recommending for (used for predicted ratings)
-    pantry: list of ingredients the user currently has
-    max_missing_ratio: how strict the constraint filter is (0.2 = missing at most 20% of ingredients)
-    top_n: how many recommendations to return
-    """
     candidates = []
 
-    # Step 1: filter by feasibility
     for index, row in recipes.iterrows():
         ingredients = row["ingredients"]
         missing = count_missing_ingredients(pantry, ingredients)
         ratio = missing / len(ingredients)
+        num_ingredients = len(ingredients)
 
         if ratio <= max_missing_ratio:
-            candidates.append(row["id"])
+            candidates.append((row["id"], row["name"], ratio, num_ingredients))
 
-    # Step 2: rank candidates by predicted rating for this user
+    # check if this user actually has rating history in our training data
+    known_users = trainset_final.all_users()  # internal surprise IDs, not raw user_ids
+    is_known_user = user_id in filtered_interactions["user_id"].values
+
+    if not is_known_user:
+        print(f"User {user_id} has no rating history — using constraint-based fallback")
+        # fall back to Step 4 style ranking: missing ratio, then most ingredients
+        candidates.sort(key=lambda x: (x[2], -x[3]))
+        return [(name, f"ratio={ratio:.2f}") for _, name, ratio, num_ingredients in candidates[:top_n]]
+
+    # known user — use collaborative filtering ranking
     scored_candidates = []
-    for recipe_id in candidates:
+    for recipe_id, name, ratio, num_ingredients in candidates:
         prediction = final_model.predict(uid=user_id, iid=recipe_id)
-        scored_candidates.append((recipe_id, prediction.est))
+        scored_candidates.append((name, prediction.est))
 
-    # Step 3: sort by predicted rating, highest first
     scored_candidates.sort(key=lambda x: x[1], reverse=True)
-
-    # Step 4: return top N, with recipe names attached
-    top_results = []
-    for recipe_id, predicted_rating in scored_candidates[:top_n]:
-        recipe_name = recipes.loc[recipes["id"] == recipe_id, "name"].values[0]
-        top_results.append((recipe_name, predicted_rating))
-
-    return top_results
+    return scored_candidates[:top_n]
 
 my_pantry = ["squash", "honey", "butter", "oil", "salt", "onion", "garlic"]
-results = recommend_recipes(user_id=8937, pantry=my_pantry)
 
-for name, predicted_rating in results:
-    print(f"{predicted_rating:.2f} - {name}")
+print("=== Known user ===")
+for name, score in recommend_recipes(user_id=8937, pantry=my_pantry):
+    print(f"{score:.2f} - {name}")
+
+print("\n=== Unknown/new user (like you) ===")
+for name, score in recommend_recipes(user_id=99999999, pantry=my_pantry):
+    print(score, "-", name)
